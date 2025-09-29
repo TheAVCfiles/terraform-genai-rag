@@ -179,7 +179,7 @@ function buildConfirmation(confirmation, messageId) {
             ${buildBox('left', 133, 35, 15, "Departure", departure_time.replace('T', ' '))}
             ${buildBox('right', 133, 35, 15, "Arrival", arrival_time.replace('T', ' '))}
             ${buildBox('left', 205, 35, 15, "Flight", flight)}
-            ${buildBox('left', 265, 35, 15, "Passenger", userName, "")}
+            ${buildBox('left', 265, 35, 15, "Passenger", userName)}
             ${buildButton("Looks good to me. Book it!", 342, "#805e9d", "#FFF", "confirmTicket" + message_id)}
             ${buildButton("I changed my mind.", 395, "#f8f8f8", "#181a23", "cancelTicket" + message_id)}
         </div></div>`;
