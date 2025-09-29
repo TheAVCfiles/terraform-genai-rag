@@ -76,7 +76,7 @@ async def create_client_session() -> aiohttp.ClientSession:
 async def init_agent(history: list[messages.BaseMessage]) -> UserAgent:
     """Load an agent executor with tools and LLM"""
     print("Initializing agent..")
-    llm = VertexAI(max_output_tokens=512, model_name="gemini-pro")
+    llm = VertexAI(max_output_tokens=512, model_name="gemini-1.0-pro")
     memory = ConversationBufferMemory(
         chat_memory=ChatMessageHistory(messages=history),
         memory_key="chat_history",
