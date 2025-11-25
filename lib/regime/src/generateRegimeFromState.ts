@@ -38,6 +38,7 @@ const DEFAULT_THRESHOLDS: Required<RegimeThresholds> = {
 /**
  * Score weights for composite calculation.
  * Balanced to prioritize clarity while respecting momentum dynamics.
+ * Note: Weights must sum to 1.0 (0.30 + 0.25 + 0.20 + 0.25 = 1.00)
  */
 const SCORE_WEIGHTS = {
   clarity: 0.30,

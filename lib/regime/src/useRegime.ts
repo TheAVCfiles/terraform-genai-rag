@@ -80,10 +80,18 @@ const defaultStateProvider: StateProvider = {
   },
 };
 
-// Module-level cache for regime outputs
+/**
+ * Module-level cache for regime outputs.
+ * Note: This creates shared mutable state. In concurrent environments
+ * or when multiple isolated instances are needed, consider using a
+ * class-based approach with instance-specific cache.
+ */
 const regimeCache: RegimeCache = {};
 
-// Track the last computed regime for transition detection
+/**
+ * Track the last computed regime for transition detection.
+ * Note: Shared mutable state - see regimeCache comment above.
+ */
 let lastRegime: RegimeOutput | undefined;
 
 /**
