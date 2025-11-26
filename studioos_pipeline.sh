@@ -21,7 +21,9 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# Default PR number for historical testing
+# Default PR number for historical testing.
+# PR #347 is used as the baseline reference for regression testing, as it represents
+# a stable, well-tested configuration from the repository's testing history.
 DEFAULT_PR_NUMBER="347"
 
 # Colors for output
@@ -99,7 +101,9 @@ parse_args() {
                 ;;
             *)
                 log_error "Unknown option: $1"
-                usage
+                echo ""
+                echo "Run '$(basename "$0") --help' for usage information."
+                exit 1
                 ;;
         esac
     done

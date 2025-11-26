@@ -95,7 +95,6 @@ jobs:
         id: pipeline
         env:
           STUDIOOS_PR_NUMBER: ${{ steps.setup.outputs.pr_number }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "::group::Pipeline Execution"
           
