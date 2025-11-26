@@ -1,0 +1,147 @@
+# Copyright 2024 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 'StudioOS Pipeline'
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to process (default: 347 for historical testing)'
+        required: false
+        default: '347'
+        type: string
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: 'studioos-pipeline-${{ github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+env:
+  # Default PR number for historical testing
+  DEFAULT_PR_NUMBER: '347'
+
+jobs:
+  studioos-pipeline:
+    name: 'Run StudioOS Pipeline'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up pipeline environment
+        id: setup
+        run: |
+          echo "::group::Environment Setup"
+          
+          # Determine PR number
+          if [[ -n "${{ github.event.inputs.pr_number }}" ]]; then
+            PR_NUMBER="${{ github.event.inputs.pr_number }}"
+            echo "Using workflow_dispatch input PR number: ${PR_NUMBER}"
+          elif [[ -n "${{ github.event.pull_request.number }}" ]]; then
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+            echo "Using pull_request event PR number: ${PR_NUMBER}"
+          else
+            PR_NUMBER="${DEFAULT_PR_NUMBER}"
+            echo "Using default PR number: ${PR_NUMBER}"
+          fi
+          
+          echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> "$GITHUB_OUTPUT"
+          
+          echo "::endgroup::"
+
+      - name: Validate pipeline script
+        run: |
+          echo "::group::Script Validation"
+          
+          if [[ ! -f "studioos_pipeline.sh" ]]; then
+            echo "::error::studioos_pipeline.sh not found in repository root"
+            exit 1
+          fi
+          
+          # Validate script syntax
+          if ! bash -n studioos_pipeline.sh; then
+            echo "::error::studioos_pipeline.sh has syntax errors"
+            exit 1
+          fi
+          
+          echo "Pipeline script validation passed"
+          echo "::endgroup::"
+
+      - name: Make pipeline script executable
+        run: chmod +x studioos_pipeline.sh
+
+      - name: Execute StudioOS Pipeline
+        id: pipeline
+        env:
+          STUDIOOS_PR_NUMBER: ${{ steps.setup.outputs.pr_number }}
+        run: |
+          echo "::group::Pipeline Execution"
+          
+          echo "Starting StudioOS Pipeline..."
+          echo "PR Number: ${STUDIOOS_PR_NUMBER}"
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.head_ref || github.ref_name }}"
+          
+          # Execute the pipeline
+          ./studioos_pipeline.sh --pr-number "${STUDIOOS_PR_NUMBER}" --verbose
+          
+          echo "::endgroup::"
+
+      - name: Generate pipeline summary
+        if: always()
+        run: |
+          echo "## StudioOS Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| **PR Number** | #${{ steps.setup.outputs.pr_number }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Event** | \`${{ github.event_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch** | \`${{ github.head_ref || github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Timestamp** | ${{ steps.setup.outputs.timestamp }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Status** | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ job.status }}" == "success" ]]; then
+            echo "✅ Pipeline completed successfully!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Pipeline failed. Please check the logs for details." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Troubleshooting" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "1. Check the 'Execute StudioOS Pipeline' step for error details" >> $GITHUB_STEP_SUMMARY
+            echo "2. Ensure all dependencies are installed" >> $GITHUB_STEP_SUMMARY
+            echo "3. Verify the PR number is valid" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Handle pipeline failure
+        if: failure()
+        run: |
+          echo "::error::StudioOS Pipeline failed. Please review the logs above for actionable error messages."
+          echo ""
+          echo "Common issues:"
+          echo "  - Missing dependencies: Ensure git and bash are available"
+          echo "  - Permission issues: Check file permissions on studioos_pipeline.sh"
+          echo "  - Invalid PR number: Verify the PR number exists and is accessible"
+          echo ""
+          echo "For more information, see the README.md documentation."

@@ -1,5 +1,61 @@
 # terraform-genai-retrieval-augmented-generation
 
+## StudioOS Pipeline Automation
+
+This repository includes automated pipeline execution via GitHub Actions to streamline development workflows.
+
+### Automatic Execution
+
+The StudioOS pipeline runs automatically when:
+- A new pull request is opened against the `main` branch
+- Updates are pushed to an active pull request
+- Manually triggered via workflow dispatch
+
+### Manual Execution
+
+You can run the pipeline manually in two ways:
+
+#### 1. Via GitHub Actions UI
+
+1. Navigate to **Actions** → **StudioOS Pipeline**
+2. Click **Run workflow**
+3. Optionally specify a custom PR number (default: `347` for historical testing)
+4. Click **Run workflow**
+
+#### 2. Via Command Line
+
+```bash
+# Run with default PR number
+./studioos_pipeline.sh
+
+# Run with a specific PR number
+./studioos_pipeline.sh --pr-number 123
+
+# Run with verbose output
+./studioos_pipeline.sh --verbose
+```
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `STUDIOOS_PR_NUMBER` | PR number to process | `347` |
+
+### Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Pipeline script not found | Ensure `studioos_pipeline.sh` exists in the repository root |
+| Permission denied | Run `chmod +x studioos_pipeline.sh` to make the script executable |
+| Missing dependencies | Ensure `git` and `bash` are installed |
+| Pipeline fails in CI | Check the GitHub Actions logs for detailed error messages |
+
+### Pipeline Results
+
+Pipeline results are available in:
+- **GitHub Actions Checks tab**: View the workflow run status and logs
+- **Job Summary**: Detailed summary with PR number, event type, and status
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Inputs
 
