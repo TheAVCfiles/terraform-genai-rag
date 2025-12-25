@@ -1,5 +1,20 @@
 # terraform-genai-retrieval-augmented-generation
 
+## Interactive Visualizations
+
+This repository includes interactive visualizations for demonstrating advanced caching and AI technologies. Visit the [visualizations portal](docs/index.html) to explore:
+
+- **[Syvaq Miracle Cache Synthesis](docs/Syvaq_Miracle_Cache_Synthesis.html)**: Real-time neural cache optimization system with interactive monitoring and controls
+
+For more information about the visualizations, see the [docs directory](docs/README.md).
+
+### GitHub Pages Access
+
+If GitHub Pages is enabled, access the visualizations at:
+```
+https://theavcfiles.github.io/terraform-genai-rag/
+```
+
 ## StudioOS Pipeline Automation
 
 This repository includes automated pipeline execution via GitHub Actions to streamline development workflows.
