@@ -322,6 +322,7 @@
             const [isRunning, setIsRunning] = useState(false);
             const [logs, setLogs] = useState([]);
             const [timestamp, setTimestamp] = useState(Date.now());
+            const [startTime] = useState(Date.now());
 
             const nodeColors = [
                 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -439,7 +440,7 @@
                             <StatItem label="Throughput" value={`${(synthesisRate * 12.5).toFixed(0)} MB/s`} />
                             <StatItem label="Latency" value={`${(100 - cacheEfficiency).toFixed(0)} ms`} />
                             <StatItem label="Hit Rate" value={`${cacheEfficiency.toFixed(1)}%`} />
-                            <StatItem label="Uptime" value={`${((timestamp - timestamp % 10000) / 1000).toFixed(0)}s`} />
+                            <StatItem label="Uptime" value={`${((timestamp - startTime) / 1000).toFixed(0)}s`} />
                         </div>
                     </div>
 
@@ -512,8 +513,9 @@
             );
         }
 
-        // Render the app
-        ReactDOM.render(<App />, document.getElementById('root'));
+        // Render the app using React 18 createRoot API
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
