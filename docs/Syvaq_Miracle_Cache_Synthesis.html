@@ -323,6 +323,12 @@
             const [logs, setLogs] = useState([]);
             const [timestamp, setTimestamp] = useState(Date.now());
             const [startTime] = useState(Date.now());
+            const [nodeData, setNodeData] = useState(() => 
+                Array.from({ length: 16 }, (_, i) => ({
+                    id: i + 1,
+                    value: Math.floor(50 + Math.random() * 50)
+                }))
+            );
 
             const nodeColors = [
                 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -356,6 +362,10 @@
                             const newVal = prev + Math.floor(Math.random() * 3 - 1);
                             return Math.max(8, Math.min(16, newVal));
                         });
+                        setNodeData(prev => prev.map(node => ({
+                            ...node,
+                            value: Math.max(30, Math.min(100, node.value + (Math.random() * 10 - 5)))
+                        })));
                         setTimestamp(Date.now());
                     }, 2000);
 
@@ -422,12 +432,12 @@
                     <div className="visualization-area">
                         <h3>Neural Network Topology</h3>
                         <div className="node-graph">
-                            {Array.from({ length: activeNodes }).map((_, i) => (
+                            {nodeData.slice(0, activeNodes).map((node) => (
                                 <Node 
-                                    key={i} 
-                                    id={i + 1} 
-                                    color={nodeColors[i % nodeColors.length]}
-                                    value={Math.floor(50 + Math.random() * 50)}
+                                    key={node.id} 
+                                    id={node.id} 
+                                    color={nodeColors[(node.id - 1) % nodeColors.length]}
+                                    value={Math.floor(node.value)}
                                     addLog={addLog}
                                 />
                             ))}
