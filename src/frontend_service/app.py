@@ -99,6 +99,8 @@ async def login_google(
 
     session = request.session
     user_info = get_user_info(str(user_id_token), client_id)
+    if not user_info:
+        raise HTTPException(status_code=401, detail="Failed to verify Google credentials")
     session["user_info"] = user_info
 
     # create new request session
@@ -219,7 +221,7 @@ def reset(request: Request):
     orchestrator.user_session_reset(request.session, uuid)
 
 
-def get_user_info(user_id_token: str, client_id: str) -> dict[str, str]:
+def get_user_info(user_id_token: str, client_id: str) -> Optional[dict[str, str]]:
     try:
         id_info = id_token.verify_oauth2_token(
             user_id_token, requests.Request(), audience=client_id
@@ -229,7 +231,9 @@ def get_user_info(user_id_token: str, client_id: str) -> dict[str, str]:
             "name": id_info["name"],
         }
     except ValueError as err:
-        return {}
+        # Return None to indicate authentication failure
+        # rather than an empty dict that might cause KeyError
+        return None
 
 
 def clear_user_info(session: dict[str, Any]):

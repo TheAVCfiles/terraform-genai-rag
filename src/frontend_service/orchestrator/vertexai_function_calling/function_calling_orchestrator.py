@@ -260,10 +260,12 @@ class FunctionCallingOrchestrator(BaseOrchestrator):
             del self._user_sessions[uuid]
 
     def close_clients(self):
-        close_client_tasks = [
-            asyncio.create_task(a.close()) for a in self._user_sessions.values()
-        ]
-        asyncio.gather(*close_client_tasks)
+        if self._user_sessions:
+            close_client_tasks = [
+                asyncio.create_task(a.close()) for a in self._user_sessions.values()
+            ]
+            # Schedule the tasks but don't block
+            asyncio.create_task(asyncio.gather(*close_client_tasks, return_exceptions=True))
 
 
 PREFIX = """The Cymbal Air Customer Service Assistant helps customers of Cymbal Air with their travel needs.
