@@ -36,7 +36,7 @@ class AppConfig(BaseModel):
     clientId: Optional[str] = None
 
 
-def parse_config(path: str) -> AppConfig:
+def parse_config() -> AppConfig:
     config = {}
     config["host"] = os.environ.get("APP_HOST", "127.0.0.1")
     config["port"] = os.environ.get("APP_PORT", 8080)
